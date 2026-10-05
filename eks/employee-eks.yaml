@@ -1,0 +1,25 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: employee-eks
+  region: ap-south-1
+  version: "1.36"
+
+upgradePolicy:
+  supportType: STANDARD
+
+autoModeConfig:
+  enabled: false
+
+managedNodeGroups:
+  - name: employee-workers
+    instanceType: m7i-flex.large
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 2
+    amiFamily: AmazonLinux2023
+    volumeSize: 30
+vpc:
+  nat:
+    gateway: Disable

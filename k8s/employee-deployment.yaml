@@ -19,9 +19,11 @@ spec:
     spec:
       containers:
         - name: employee-service
-          image: employee-service:v1
+         # image: employee-service:v1
+          image: 411653576368.dkr.ecr.ap-south-1.amazonaws.com/employee-service:v1
 
-          imagePullPolicy: Never
+         # imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 8080
@@ -36,6 +38,14 @@ spec:
 
             - name: SPRING_DATASOURCE_PASSWORD
               value: "zSCALER#1999"
+
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 60   # 10 + 60*10 = up to 610s to finish starting before liveness/readiness kick in
 
           readinessProbe:
             httpGet:
