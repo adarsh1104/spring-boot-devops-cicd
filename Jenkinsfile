@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(
+            name: 'DEPLOY_TO_EKS',
+            defaultValue: false,
+            description: 'Deploy the newly built image to the existing EKS deployment'
+        )
+    }
+
     environment {
         AWS_REGION = 'ap-south-1'
         ECR_REGISTRY = '411653576368.dkr.ecr.ap-south-1.amazonaws.com'
@@ -51,6 +59,12 @@ pipeline {
         }
 
         stage('Deploy to EKS') {
+            when {
+                expression {
+                    return params.DEPLOY_TO_EKS
+                }
+            }
+
             steps {
                 bat 'kubectl set image deployment/%DEPLOYMENT_NAME% %CONTAINER_NAME%=%IMAGE_URI%'
 
@@ -70,7 +84,9 @@ pipeline {
 
     post {
         success {
-            echo "Deployment successful: ${IMAGE_URI}"
+            echo "Pipeline completed successfully."
+            echo "Image: ${IMAGE_URI}"
+            echo "EKS deployment requested: ${params.DEPLOY_TO_EKS}"
         }
 
         failure {
